@@ -3,6 +3,7 @@ package oci
 import (
 	"context"
 
+	"github.com/opencontainers/go-digest"
 	ispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/opencontainers/umoci/oci/casext"
 	"github.com/pkg/errors"
@@ -47,7 +48,7 @@ func LookupConfig(oci casext.Engine, desc ispec.Descriptor) (ispec.Image, error)
 
 // UpdateImageConfig updates an oci tag with new config and new manifest
 func UpdateImageConfig(oci casext.Engine, name string, newConfig ispec.Image, newManifest ispec.Manifest) (ispec.Descriptor, error) {
-	configDigest, configSize, err := oci.PutBlobJSON(context.Background(), newConfig)
+	configDigest, configSize, err := oci.PutBlobJSON(context.Background(), newConfig, digest.SHA256)
 	if err != nil {
 		return ispec.Descriptor{}, err
 	}
@@ -58,7 +59,7 @@ func UpdateImageConfig(oci casext.Engine, name string, newConfig ispec.Image, ne
 		Size:      configSize,
 	}
 
-	manifestDigest, manifestSize, err := oci.PutBlobJSON(context.Background(), newManifest)
+	manifestDigest, manifestSize, err := oci.PutBlobJSON(context.Background(), newManifest, digest.SHA256)
 	if err != nil {
 		return ispec.Descriptor{}, err
 	}
